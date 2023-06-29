@@ -2,20 +2,14 @@
     "user_records": [
         {
             "name": "abcdefghi",
-            "email_sign": "abcdef@gmail.com",
-            "password": "111222333",
+            "email_sign": "sandeshpathak282@gmail.com",
+            "password": "999999999",
             "otp": ""
         },
         {
             "name": "Sandesh123",
             "email_sign": "018bscit035@sxc.edu.np",
-            "password": "sandesh1234",
-            "otp": ""
-        },
-        {
-            "name": "SandeshPathak",
-            "email_sign": "abc123@gmail.com",
-            "password": "sandeshwithotp",
+            "password": "111222333",
             "otp": ""
         }
     ]

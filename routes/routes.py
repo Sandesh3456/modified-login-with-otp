@@ -99,9 +99,7 @@ def post_login():
     print('post----')
     email_sign= flask.request.form["email_signup"]
     password = flask.request.form["password"]
-    # print("name is =",email_sign)
-    # print("password is =",password)       
-
+    # session['email_sign2']=email_sign      
     with open('data.json') as user_file:
         file_contents = user_file.read()
 
@@ -116,7 +114,8 @@ def post_login():
 
             print("signed_email is",i['email_sign'])
             print("signed_password is",i['password'])
-            return flask.render_template("Welcomepage.html") 
+            session['email_sign2']=email_sign 
+            return flask.render_template("Welcomepage.html")
         else:
             print("error signed_email is",i['email_sign'])
             print("eeror signed_password is",i['password'])
@@ -146,12 +145,16 @@ def post_forgot():
 
     for i in parsed_json['user_records']:
         if(i['email_sign']==email_sign):
-            length=16
+            receiver=[]
+            receiver.append(email_sign)
+            print(receiver)
+            print(type(receiver))
+            length=8
             characters = string.ascii_letters + string.digits + string.punctuation
-            password= "".join(secrets.choice(characters) for i in range(length))
-            session['Password2']=password
-            msg = Message(subject='Hello ! Reset Your Password', sender='sandeshpathak282@gmail.com', recipients=['018bscit035@sxc.edu.np'])
-            msg.body = 'Your one time password is {}'.format(password)
+            otp= "".join(secrets.choice(characters) for i in range(length))
+            session['otp']=otp
+            msg = Message(subject='Hello ! Reset Your Password', sender='sandeshpathak282@gmail.com', recipients=receiver)
+            msg.body = 'Your one time password is {}'.format(otp)
             mail.send(msg)
             return flask.render_template("returnpage.html",action="/pwdchange_post")
         else:
@@ -162,27 +165,43 @@ def post_forgot():
 @app.route("/pwdchange_post", methods = ["POST"])
 def post_pwdchange():
     email_sign2 = session.get('email_sign2')
-    password3 = session.get('Password2')
-
+    otp = session.get('otp')
+    print("Hello")
     with open('data.json','r+') as file:
         data = json.load(file)
 
 
     for user in data['user_records']:
         if (user["email_sign"]==email_sign2): 
-            user["password"] = password3;   
+            user["otp"] = otp;   
 
 
     with open('data.json', 'w') as file:
         json.dump(data, file, indent=4)
-    return flask.render_template("login.html",action="/login_post")
+    return flask.render_template("Welcomepage.html")
 
 
 @app.route("/newpassword")
 def newpassword():
     return flask.render_template("newpassword.html",action="/newpassword_post")
 
+
 @app.route("/newpassword_post", methods = ["POST"])
 def post_newpassword():
-    email_sign=flask.request.form["email_signup"]
+    new_password=flask.request.form["new_password"]
+    confirm_new_password=flask.request.form["confirm_new_password"]
+    email_sign2=session.get('email_sign2')
     
+    with open('data.json','r+') as file:
+        data = json.load(file)
+
+
+    for user in data['user_records']:
+        if (user["email_sign"]==email_sign2 and new_password==confirm_new_password): 
+            user["password"] = new_password   
+            user["otp"] =""
+
+    with open('data.json', 'w') as file:
+        json.dump(data, file, indent=4)
+    return flask.render_template("login.html",action="/login_post")
+
