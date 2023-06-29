@@ -1,0 +1,14 @@
+{
+    "user_records": [
+        {
+            "name": "sandesh",
+            "email_sign": "sandesh@gmail.com",
+            "password": "sandesh@1234"
+        },
+        {
+            "name": "abc",
+            "email_sign": "abc@gmail.com",
+            "password": "abc"
+        }
+    ]
+}
