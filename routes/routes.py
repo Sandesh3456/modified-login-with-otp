@@ -1,4 +1,4 @@
-from flask import Flask,session
+from flask import Flask,session,flash
 import flask 
 import json
 import re
@@ -6,6 +6,10 @@ from flask_mail import Mail,Message
 import string 
 import secrets
 from flask_session import Session
+from datetime import timedelta
+from functools import wraps
+from werkzeug.utils import redirect
+
 
 app= Flask(
     __name__,
@@ -25,6 +29,25 @@ mail = Mail(app)
 
 
 app.secret_key="duw283rgdwq"
+
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=30)
+
+
+
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'email_sign2' in session:
+            return f(*args, **kwargs)
+        else:
+            flash("You need to login first")
+            return redirect('/login')
+    return wrap
+
 
 
 @app.route("/signup")
@@ -79,7 +102,7 @@ def post_signup():
 
     write_json(signup_data)
 
-    return flask.render_template("homepage.html")
+    return flask.render_template("login.html")
 
 @app.route("/")
 @app.route("/homepage")
@@ -98,8 +121,7 @@ def login():
 def post_login():
     print('post----')
     email_sign= flask.request.form["email_signup"]
-    password = flask.request.form["password"]
-    # session['email_sign2']=email_sign      
+    password = flask.request.form["password"]    
     with open('data.json') as user_file:
         file_contents = user_file.read()
 
