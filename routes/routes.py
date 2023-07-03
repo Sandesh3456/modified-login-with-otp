@@ -1,4 +1,4 @@
-from flask import Flask,session,flash
+from flask import Flask,session, flash
 import flask 
 import json
 import re
@@ -6,9 +6,9 @@ from flask_mail import Mail,Message
 import string 
 import secrets
 from flask_session import Session
+from werkzeug.utils import redirect
 from datetime import timedelta
 from functools import wraps
-from werkzeug.utils import redirect
 
 
 app= Flask(
@@ -18,16 +18,9 @@ app= Flask(
     static_folder = "../UI/static/",
     )
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = "sandeshpathak282@gmail.com"
-app.config['MAIL_PASSWORD'] = "lknrkhplqrdgcqhr"
-
-
+app.config.from_pyfile("config.py")
+Session(app)
 mail = Mail(app)
-
-
 app.secret_key="duw283rgdwq"
 
 
@@ -35,7 +28,6 @@ app.secret_key="duw283rgdwq"
 def make_session_permanent():
     session.permanent = True
     app.permanent_session_lifetime = timedelta(minutes=30)
-
 
 
 def login_required(f):
@@ -47,7 +39,6 @@ def login_required(f):
             flash("You need to login first")
             return redirect('/login')
     return wrap
-
 
 
 @app.route("/signup")
@@ -67,8 +58,6 @@ def post_signup():
     signup_data["email_sign"]=email_sign
     signup_data["password"]=password
     signup_data["otp"]=otp
-    print(signup_data)
-    print("---")
 
 
     regex = re.compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]*])")
@@ -104,8 +93,10 @@ def post_signup():
 
     return flask.render_template("login.html")
 
+
 @app.route("/")
 @app.route("/homepage")
+@login_required
 def home():
     topic = "HELLO EVERYONE" 
     return flask.render_template("homepage.html",header=topic)
@@ -119,28 +110,20 @@ def login():
 
 @app.route("/login_post", methods = ["POST"])
 def post_login():
-    print('post----')
     email_sign= flask.request.form["email_signup"]
     password = flask.request.form["password"]    
     with open('data.json') as user_file:
         file_contents = user_file.read()
 
     parsed_json = json.loads(file_contents)
-    # print(parsed_json)
+
     
-    for i in parsed_json['user_records']:
-
-        print("here",i["name"], i["password"])
-        
+    for i in parsed_json['user_records']:    
         if(i['email_sign']==email_sign and i['password']==password):
-
-            print("signed_email is",i['email_sign'])
-            print("signed_password is",i['password'])
             session['email_sign2']=email_sign 
+            session['username']=i['name']
             return flask.render_template("Welcomepage.html")
-        else:
-            print("error signed_email is",i['email_sign'])
-            print("eeror signed_password is",i['password'])
+        else: 
             login_status = "False"
 
 
@@ -169,11 +152,10 @@ def post_forgot():
         if(i['email_sign']==email_sign):
             receiver=[]
             receiver.append(email_sign)
-            print(receiver)
-            print(type(receiver))
             length=8
             characters = string.ascii_letters + string.digits + string.punctuation
             otp= "".join(secrets.choice(characters) for i in range(length))
+            session['username']=i['name']
             session['otp']=otp
             msg = Message(subject='Hello ! Reset Your Password', sender='sandeshpathak282@gmail.com', recipients=receiver)
             msg.body = 'Your one time password is {}'.format(otp)
@@ -187,26 +169,33 @@ def post_forgot():
 @app.route("/pwdchange_post", methods = ["POST"])
 def post_pwdchange():
     email_sign2 = session.get('email_sign2')
+    print("The session email is",email_sign2)
     otp = session.get('otp')
-    print("Hello")
-    with open('data.json','r+') as file:
-        data = json.load(file)
+    print("The otp is",otp)
+    otp2=flask.request.form["user_otp"]
+    if otp2==otp:
+        with open('data.json','r+') as file:
+            data = json.load(file)
 
+        for user in data['user_records']:
+            if (user["email_sign"]==email_sign2): 
+                user["otp"] = otp;   
 
-    for user in data['user_records']:
-        if (user["email_sign"]==email_sign2): 
-            user["otp"] = otp;   
-
-
-    with open('data.json', 'w') as file:
-        json.dump(data, file, indent=4)
-    return flask.render_template("Welcomepage.html")
+        with open('data.json', 'w') as file:
+            json.dump(data, file, indent=4)
+        return flask.render_template("Welcomepage.html")   
+    else:
+        return redirect('/forgot')
 
 
 @app.route("/newpassword")
 def newpassword():
-    return flask.render_template("newpassword.html",action="/newpassword_post")
-
+    email_sign2=session.get('email_sign2')
+    print("The session value is ",email_sign2)
+    if email_sign2!=None:
+        return flask.render_template("newpassword.html",action="/newpassword_post")
+    else:
+        return flask.render_template("homepage.html")
 
 @app.route("/newpassword_post", methods = ["POST"])
 def post_newpassword():
@@ -227,3 +216,8 @@ def post_newpassword():
         json.dump(data, file, indent=4)
     return flask.render_template("login.html",action="/login_post")
 
+@app.route("/logout")
+@login_required
+def logout():
+    session.clear()
+    return redirect('/login')

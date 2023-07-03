@@ -3,14 +3,20 @@
         {
             "name": "abcdefghi",
             "email_sign": "sandeshpathak282@gmail.com",
-            "password": "999999999",
+            "password": "1212221121",
             "otp": ""
         },
         {
             "name": "Sandesh123",
             "email_sign": "018bscit035@sxc.edu.np",
-            "password": "111222333",
-            "otp": ""
+            "password": "11111111111",
+            "otp": "K[E%#_p&"
+        },
+        {
+            "name": "Sandesh1234",
+            "email_sign": "pathak2057@gmail.com",
+            "password": "11111111111",
+            "otp": "?TPv&krY"
         }
     ]
 }

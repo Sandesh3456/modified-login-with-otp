@@ -9,4 +9,3 @@ for user in data['user_records']:
         user["password"] = "sandesh@1234";         
 with open('test.json', 'w') as file:
     json.dump(data, file, indent=4)
-
