@@ -3,20 +3,38 @@
         {
             "name": "abcdefghi",
             "email_sign": "sandeshpathak282@gmail.com",
-            "password": "135791357",
-            "otp": "TCzUjK=T"
+            "password": "121212212",
+            "otp": "kG@-34+;"
         },
         {
             "name": "Sandesh123",
             "email_sign": "018bscit035@sxc.edu.np",
-            "password": "11111111111",
-            "otp": "K[E%#_p&"
+            "password": "123123123",
+            "otp": "R4@?j=|C"
         },
         {
             "name": "Sandesh1234",
             "email_sign": "pathak2057@gmail.com",
             "password": "11111111111",
             "otp": "?TPv&krY"
+        },
+        {
+            "name": "suman1234",
+            "email_sign": "abc123@gmail.com",
+            "password": "123456789",
+            "otp": ""
+        },
+        {
+            "name": "abcsdasdas",
+            "email_sign": "a@gmail.com",
+            "password": "111111111",
+            "otp": ""
+        },
+        {
+            "name": "abc123123123",
+            "email_sign": "aabbcc@gmail.com",
+            "password": "123123123",
+            "otp": ""
         }
     ]
 }

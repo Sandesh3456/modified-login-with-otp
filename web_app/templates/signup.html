@@ -7,6 +7,16 @@
     <body>
         <div class="back"> 
         <div class="container">
+        <div>
+            {% with errors = get_flashed_messages(category_filter=["Wrong_Email"]) %}
+            {% if errors %}  
+            {% for msg in errors %}
+              <strong>{{ msg }}</strong> 
+              <br><br>
+            {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
         <form method="POST" action={{action}}>
             <label>Username:</label>  
             <input type="text" name="username" autofocus="" id="name" value="" required ><br><br>

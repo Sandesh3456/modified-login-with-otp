@@ -27,7 +27,7 @@ app.secret_key="duw283rgdwq"
 @app.before_request
 def make_session_permanent():
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=30)
+    app.permanent_session_lifetime = timedelta(minutes=1)
 
 
 def login_required(f):
@@ -158,10 +158,11 @@ def post_forgot():
             session['username']=i['name']
             session['otp']=otp
             msg = Message(subject='Hello ! Reset Your Password', sender='sandeshpathak282@gmail.com', recipients=receiver)
-            msg.body = 'Your one time password is {}'.format(otp)
+            msg.body = 'Your one time password is {}.Please use the one time password within one minutes'.format(otp)
             mail.send(msg)
             return flask.render_template("returnpage.html",action="/pwdchange_post")
         else:
+            flash("The email is not available in the record.Sign in",'Wrong_Email')
             pass
     return flask.render_template("signup.html")    
 
@@ -185,6 +186,7 @@ def post_pwdchange():
             json.dump(data, file, indent=4)
         return flask.render_template("Welcomepage.html")   
     else:
+        flash("You Entered the wrong OTP. Please Enter your Email Again",'Wrong_OTP')
         return redirect('/forgot')
 
 
@@ -221,3 +223,4 @@ def post_newpassword():
 def logout():
     session.clear()
     return redirect('/login')
+
